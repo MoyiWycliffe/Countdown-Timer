@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Countdown Timer Calculator</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f0f4f8;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+  }
+  .countdown {
+    background: white;
+    padding: 30px 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+  }
+  h2 {
+    margin-bottom: 20px;
+    color: #0277bd;
+  }
+  input[type="datetime-local"] {
+    width: 100%;
+    padding: 10px 15px;
+    margin: 10px 0 20px;
+    font-size: 16px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+  }
+  #countdownDisplay {
+    font-weight: bold;
+    font-size: 16px;
+    color: #01579b;
+    white-space: pre-wrap;
+  }
+  button {
+    background-color: #0288d1;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 18px;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 15px;
+    transition: background-color 0.3s ease;
+  }
+  button:hover {
+    background-color: #01579b;
+  }
+</style>
+</head>
+<body>
+  <div class="countdown">
+    <h2>Countdown Timer Calculator</h2>
+    <input type="datetime-local" id="targetDateTime" />
+    <button onclick="startCountdown()">Start Countdown</button>
+    <div id="countdownDisplay">Please select a future date and time.</div>
+  </div>
+
+  <script>
+    let countdownInterval;
+
+    function startCountdown() {
+      clearInterval(countdownInterval);
+      const input = document.getElementById('targetDateTime').value;
+      const display = document.getElementById('countdownDisplay');
+
+      if (!input) {
+        display.textContent = 'Please select a future date and time.';
+        return;
+      }
+
+      const targetDate = new Date(input);
+      const now = new Date();
+
+      if (targetDate <= now) {
+        display.textContent = 'Please select a date/time in the future.';
+        return;
+      }
+
+      countdownInterval = setInterval(() => {
+        const now = new Date();
+        let diff = targetDate - now;
+
+        if (diff <= 0) {
+          clearInterval(countdownInterval);
+          display.textContent = 'Countdown complete!';
+          return;
+        }
+
+        // Calculate years, months, days, weeks, hours, mins, seconds, milliseconds
+        // For years and months, we use approximate approach based on dates
+
+        let years = targetDate.getFullYear() - now.getFullYear();
+        let months = targetDate.getMonth() - now.getMonth();
+        let days = targetDate.getDate() - now.getDate();
+        let hours = targetDate.getHours() - now.getHours();
+        let minutes = targetDate.getMinutes() - now.getMinutes();
+        let seconds = targetDate.getSeconds() - now.getSeconds();
+        let milliseconds = targetDate.getMilliseconds() - now.getMilliseconds();
+
+        // Adjust if any are negative, borrowing from larger units
+        if (milliseconds < 0) {
+          milliseconds += 1000;
+          seconds--;
+        }
+        if (seconds < 0) {
+          seconds += 60;
+          minutes--;
+        }
+        if (minutes < 0) {
+          minutes += 60;
+          hours--;
+        }
+        if (hours < 0) {
+          hours += 24;
+          days--;
+        }
+        if (days < 0) {
+          // Get days in previous month
+          let prevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+          days += prevMonth.getDate();
+          months--;
+        }
+        if (months < 0) {
+          months += 12;
+          years--;
+        }
+
+        // Weeks from days
+        let weeks = Math.floor(days / 7);
+        days = days % 7;
+
+        display.textContent = 
+          `Years: ${years}\n` +
+          `Months: ${months}\n` +
+          `Weeks: ${weeks}\n` +
+          `Days: ${days}\n` +
+          `Hours: ${hours}\n` +
+          `Minutes: ${minutes}\n` +
+          `Seconds: ${seconds}\n` +
+          `Milliseconds: ${milliseconds}`;
+      }, 50);
+    }
+  </script>
+</body>
+</html>
